@@ -1,9 +1,18 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { HomeLayout, About, Landing, Error, Newsletter, Hotels } from "./Pages";
+import {
+  HomeLayout,
+  About,
+  Landing,
+  Error,
+  Newsletter,
+  Cocktail,
+  SinglePageError,
+} from "./Pages";
 
 ////nesting the router Pages so all its connected to the Home Page , also need to outlet component to connect the parent to children component
 
 import { loader as LandingLoader } from "./Pages/Landing";
+import { loader as SingleCocktailPageError } from "./Pages/Cocktail";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,6 +25,7 @@ const router = createBrowserRouter([
         ////That way we have the Main page and the contents of the actual page
         index: true,
         element: <Landing />,
+        errorElement: <SinglePageError />,
         loader: LandingLoader,
       },
       {
@@ -28,8 +38,10 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "cocktails",
-        element: <Hotels />,
+        path: "cocktail/:id",
+        errorElement: <SingleCocktailPageError />,
+        loader: SingleCocktailPageError,
+        element: <Cocktail />,
       },
       {
         path: "newsletter",
