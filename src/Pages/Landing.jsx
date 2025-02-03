@@ -5,13 +5,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import CryptoJS from "crypto-js";
 import CocktailList from "../components/CocktailList";
+import SearchForm from "../components/SearchForm";
 
 const cocktailSearchUrl =
-  "https://www.thecocktaildb.com/api/json/v1/1/search.php?f=a";
+  "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=";
 
 const searchURL = "https://www.thecocktaildb.com/api/json/v1/1/search.php?s=";
 
-export const loader = async () => {
+export const loader = async ({ request }) => {
   //////////// FOR A FUTURE PROJECT MAYBE //////////////////
   //   const GeoLocation = async () => {
   //     try {
@@ -87,15 +88,21 @@ export const loader = async () => {
   //   return { token, hotelImg, hotels };
   //// END POINT FOR NEW PR /////////////////////////////////
   /////......WHEN WE KNOW BACKEND SMH.........///////////////
-  const searchTerm = "";
+
+  const url = new URL(request.url);
+  const searchTerm = url.searchParams.get("search") || "cocktail";
   const response = await axios.get(`${cocktailSearchUrl}${searchTerm}`);
+
   return { drinks: response.data.drinks, searchTerm };
 };
 const Landing = () => {
   const { drinks, searchTerm } = useLoaderData();
 
-  return <>
-  <CocktailList drinks={drinks}/>
-  </>;
+  return (
+    <>
+      <SearchForm searchTerm={searchTerm} />
+      <CocktailList drinks={drinks} />
+    </>
+  );
 };
 export default Landing;

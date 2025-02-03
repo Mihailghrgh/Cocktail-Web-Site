@@ -5,6 +5,8 @@ const CocktailList = ({ drinks }) => {
   if (!drinks) {
     return <h2>No drinks in the List</h2>;
   }
+  console.log(drinks);
+  
   const formattedDrink = drinks.map((item) => {
     const { idDrink, strDrink, strDrinkThumb, strAlcoholic, strGlass } = item;
 
