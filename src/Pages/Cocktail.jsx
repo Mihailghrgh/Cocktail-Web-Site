@@ -1,21 +1,34 @@
 import { useLoaderData, Link, Navigate } from "react-router-dom";
 import axios from "axios";
 import Wrapper from "../assets/wrappers/CocktailPage";
-
+import { useQuery } from "@tanstack/react-query";
 const singleURL = "https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=";
 
-////important !! useLoaderData is used to return the data from the nearest loader component
-export const loader = async ({ params }) => {
-  //// So, Instead of doing like a deeply nested Component structure to pass on the fetch data , we used the loader functions which is ASYNC to take the params and pass it down the component
-  console.log(params);
-
-  const { id } = params;
-  const { data } = await axios.get(`${singleURL}${id}`);
-  return { id, data };
+const singleCocktailQuery = (id) => {
+  return {
+    queryKey: ["cocktail", id],
+    queryFn: async () => {
+      const { data } = await axios.get(`${singleURL}${id}`);
+      return data;
+    },
+  };
 };
 
+////important !! useLoaderData is used to return the data from the nearest loader component
+export const loader =
+  (queryClient) =>
+  async ({ params }) => {
+    //// So, Instead of doing like a deeply nested Component structure to pass on the fetch data , we used the loader functions which is ASYNC to take the params and pass it down the component
+
+    const { id } = params;
+    await queryClient.ensureQueryData(singleCocktailQuery(id));
+    return { id };
+  };
+
 const Cocktail = () => {
-  const { id, data } = useLoaderData();
+  const { id } = useLoaderData();
+
+  const { data } = useQuery(singleCocktailQuery(id));
 
   if (!data) return <Navigate to="/" />;
 

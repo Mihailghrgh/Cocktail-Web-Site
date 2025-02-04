@@ -8,12 +8,22 @@ import {
   Cocktail,
   SinglePageError,
 } from "./Pages";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { loader as LandingLoader } from "./Pages/Landing";
+import { loader as SingleCocktailLoader } from "./Pages/Cocktail";
+import { action as NewsLetterAction } from "./Pages/Newsletter";
 
 ////nesting the router Pages so all its connected to the Home Page , also need to outlet component to connect the parent to children component
 
-import { loader as LandingLoader } from "./Pages/Landing";
-import { loader as SingleCocktailPageError } from "./Pages/Cocktail";
-import { action as NewsLetterAction } from "./Pages/Newsletter";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -27,7 +37,7 @@ const router = createBrowserRouter([
         index: true,
         element: <Landing />,
         errorElement: <SinglePageError />,
-        loader: LandingLoader,
+        loader: LandingLoader(queryClient),
       },
       {
         ////Inside another page you can deeply nest multiple components with attributes , style , links etc
@@ -43,8 +53,8 @@ const router = createBrowserRouter([
         path: "cocktail/:id",
         ////Loader basically passes the following Element:
         //! "cocktail/ this text or ID or what ever it is passed the "/" which can be used inside the loader element "
-        errorElement: <SingleCocktailPageError />,
-        loader: SingleCocktailPageError,
+        errorElement: <SinglePageError />,
+        loader: SingleCocktailLoader(queryClient),
         element: <Cocktail />,
       },
       {
@@ -58,6 +68,11 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+      <ReactQueryDevtools initialIsOpen={true} />
+    </QueryClientProvider>
+  );
 };
 export default App;
